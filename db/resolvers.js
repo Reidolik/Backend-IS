@@ -10,6 +10,7 @@ const Voto = require('../models/Voto')
 const Eleccion = require('../models/Eleccion')
 const MesaVotacion = require('../models/MesaVotacion')
 const ResultadoElectoral = require('../models/ResultadoElectoral')
+const AutoridadMesa = require('../models/AutoridadMesa')
 
 //Crear token
 const crearToken = (usuario, secreto, expiracion) => {
@@ -81,7 +82,7 @@ const resolvers = {
         },
         //Mesa de votacion
         obtenerMesaVotacionVotante: async (_, { dpi, anio }) => {
-            
+
             //Verificar que exista el ciudadano
             const existeCiudadano = await Ciudadano.findOne({ dpi })
 
@@ -112,10 +113,27 @@ const resolvers = {
             if (!existeEleccion) {
                 throw new Error('Eleccion no esta registrado')
             }
-            
+
             try {
                 const resultadosElectorales = await ResultadoElectoral.find()
                 return resultadosElectorales
+            } catch (error) {
+                console.log(error)
+            }
+        },
+        //Autoridad de mesa
+        obtenerAutoridadMesa: async (_, { nombre, apellido, idMesa }) => {
+
+            //Verificar la existencia de la mesa
+            const mesaData = await MesaVotacion.findOne({ _id: idMesa })
+
+            if (!mesaData) {
+                throw new Error('No existe la mesa a buscar')
+            }
+
+            try {
+                const autoridadMesa = await AutoridadMesa.findOne({ mesa_votacion_id: idMesa, nombre, apellido })
+                return autoridadMesa
             } catch (error) {
                 console.log(error)
             }
@@ -218,7 +236,7 @@ const resolvers = {
         },
         //mesa de votacion
         nuevaMesaVotacionVotante: async (_, { dpi, anio, input }) => {
-            
+
             //Verificar que exista el ciudadano
             const existeCiudadano = await Ciudadano.findOne({ dpi })
 
@@ -276,6 +294,41 @@ const resolvers = {
                 const resultadoElectoral = new ResultadoElectoral(input)
                 resultadoElectoral.save()
                 return resultadoElectoral
+            } catch (error) {
+                console.log(error)
+            }
+        },
+        //Autoridad de mesa
+        nuevaAutoridadMesa: async (_, { input }) => {
+
+            const { mesa_votacion_id, dpi } = input
+
+            //Comprobar existencia de la mesa de votacion
+            const mesaData = await MesaVotacion.findOne({ _id: mesa_votacion_id })
+
+            if (!mesaData) {
+                throw new Error('No existe la mesa a buscar')
+            }
+
+            //Comprobar que exista el ciudadano
+            const existeCiudadano = await Ciudadano.findOne({ dpi })
+
+            if (!existeCiudadano) {
+                throw new Error('Ciudadano no esta registrado')
+            }
+
+            //Comprobar que no este asignado dos veces la misma persona
+            const existeAutoridad = await AutoridadMesa.findOne({ dpi })
+
+            if (existeAutoridad) {
+                throw new Error('Ya esta registrada la persona como autoridad')
+            }
+
+            //Guardar en BD
+            try {
+                const autoridadMesa = new AutoridadMesa(input)
+                autoridadMesa.save()
+                return autoridadMesa
             } catch (error) {
                 console.log(error)
             }

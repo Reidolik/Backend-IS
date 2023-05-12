@@ -70,6 +70,16 @@ const typeDefs = gql`
         token: String
     }
 
+    type AutoridadMesa {
+        id: ID
+        mesa_votacion_id: ID
+        nombre: String
+        apellido: String
+        dpi: String
+        puesto: String
+        creado: String
+    }
+
     #inputs
     input CiudadanoInput {
         nombre: String!
@@ -117,6 +127,14 @@ const typeDefs = gql`
         fecha_acta: String!
     }
 
+    input AutoridadMesaInput {
+        mesa_votacion_id: ID!
+        nombre: String!
+        apellido: String!
+        dpi: String!
+        puesto: String!
+    }
+
     input AutenticarInput {
         email: String!
         password: String!
@@ -137,6 +155,8 @@ const typeDefs = gql`
         obtenerMesaVotacionVotante (dpi: ID!, anio: Int!): MesaVotacion
         #Resultado electoral
         obtenerResultadosElectorales (anio: Int!): [ResultadoElectoral]
+        #Autoridad de mesa
+        obtenerAutoridadMesa (nombre: String!, apellido: String!, idMesa: ID!): AutoridadMesa
     }
 
     #Mutation
@@ -153,6 +173,8 @@ const typeDefs = gql`
         nuevaMesaVotacionVotante (dpi: ID!, anio: Int!, input: MesaVotacionInput!): MesaVotacion
         #Resultado electoral
         nuevoResultadoElectoral (anio: Int!, input: ResultadoElectoralInput!): ResultadoElectoral
+        #Autoridad de mesa
+        nuevaAutoridadMesa (input: AutoridadMesaInput!): AutoridadMesa
     }
 
 `

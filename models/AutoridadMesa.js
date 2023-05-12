@@ -19,7 +19,8 @@ const AutoridadMesaSchema = mongoose.Schema({
     dpi: {
         type: String,
         required:true,
-        trim: true
+        trim: true,
+        unique: true
     },
     puesto: {
         type: String,
