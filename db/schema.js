@@ -66,8 +66,14 @@ const typeDefs = gql`
         creado: String
     }
 
-    type Token {
-        token: String
+    type ActasMesa {
+        id: ID
+        mesa_votacion_id: ID
+        eleccion_id: ID
+        firma_presidente_mesa: Boolean
+        firma_vicepresidente_mesa: Boolean
+        fecha_acta: String
+        creado: String
     }
 
     type AutoridadMesa {
@@ -78,6 +84,19 @@ const typeDefs = gql`
         dpi: String
         puesto: String
         creado: String
+    }
+
+    type Usuario {
+        id: ID
+        nombre: String
+        apellido: String
+        email: String
+        password: String
+        creado: String
+    }
+
+    type Token {
+        token: String
     }
 
     #inputs
@@ -135,6 +154,20 @@ const typeDefs = gql`
         puesto: String!
     }
 
+    input ActasMesaInput {
+        mesa_votacion_id: ID!
+        firma_presidente_mesa: Boolean!
+        firma_vicepresidente_mesa: Boolean!
+        fecha_acta: String!
+    }
+
+    input UsuarioInput {
+        nombre: String!
+        apellido: String!
+        email: String!
+        password: String!
+    }
+
     input AutenticarInput {
         email: String!
         password: String!
@@ -157,6 +190,10 @@ const typeDefs = gql`
         obtenerResultadosElectorales (anio: Int!): [ResultadoElectoral]
         #Autoridad de mesa
         obtenerAutoridadMesa (nombre: String!, apellido: String!, idMesa: ID!): AutoridadMesa
+        #Actas de mesa
+        obtenerActasMesa (idMesa: ID, anio: Int!): ActasMesa
+        #Usuario
+        obtenerUsuario (token: String!): Usuario
     }
 
     #Mutation
@@ -175,6 +212,11 @@ const typeDefs = gql`
         nuevoResultadoElectoral (anio: Int!, input: ResultadoElectoralInput!): ResultadoElectoral
         #Autoridad de mesa
         nuevaAutoridadMesa (input: AutoridadMesaInput!): AutoridadMesa
+        #Actaas de mesa
+        nuevaActaMesa (anio: Int!, input: ActasMesaInput!): ActasMesa
+        #Usuario
+        nuevoUsuario (input: UsuarioInput!): Usuario
+        autenticarUsuario (input: AutenticarInput!): Token
     }
 
 `

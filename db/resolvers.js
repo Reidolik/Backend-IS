@@ -3,7 +3,7 @@ const Candidato = require('../models/Candidato')
 const Ciudadano = require('../models/Ciudadano')
 
 //Librerias u otros
-//const bcryptjs = require('bcryptjs')
+const bcryptjs = require('bcryptjs')
 require('dotenv').config({ path: 'variables.env' })
 const jwt = require('jsonwebtoken')
 const Voto = require('../models/Voto')
@@ -11,6 +11,8 @@ const Eleccion = require('../models/Eleccion')
 const MesaVotacion = require('../models/MesaVotacion')
 const ResultadoElectoral = require('../models/ResultadoElectoral')
 const AutoridadMesa = require('../models/AutoridadMesa')
+const ActasMesa = require('../models/ActasMesa')
+const Usuario = require('../models/Usuario')
 
 //Crear token
 const crearToken = (usuario, secreto, expiracion) => {
@@ -137,6 +139,36 @@ const resolvers = {
             } catch (error) {
                 console.log(error)
             }
+        },
+        //Actas de mesa
+        obtenerActasMesa: async(_, { idMesa, anio }) => {
+
+            //Verificar la existencia de la mesa
+            const mesaData = await MesaVotacion.findOne({ _id: idMesa })
+
+            if (!mesaData) {
+                throw new Error('No existe la mesa a buscar')
+            }
+
+            //Verificar que exista la eleccion
+            const existeEleccion = await Eleccion.findOne({ anio_eleccion: anio })
+
+            if (!existeEleccion) {
+                throw new Error('Eleccion no esta registrado')
+            }
+
+            try {
+                const actaMesa = await ActasMesa.findOne({ mesa_votacion_id: idMesa, eleccion_id: existeEleccion._id })
+                return actaMesa
+            } catch (error) {
+                console.log(error)
+            }
+        },
+        //Usuario
+        obtenerUsuario: async (_, { token }) => {
+            const usuarioId = await jwt.verify(token, process.env.SIGN_SECRET)
+
+            return usuarioId
         }
     },
     Mutation: {
@@ -331,6 +363,77 @@ const resolvers = {
                 return autoridadMesa
             } catch (error) {
                 console.log(error)
+            }
+        },
+        //Actas de mesa
+        nuevaActaMesa: async (_, { anio, input }) => {
+
+            //Verificar que exista la eleccion
+            const existeEleccion = await Eleccion.findOne({ anio_eleccion: anio })
+
+            if (!existeEleccion) {
+                throw new Error('Eleccion no esta registrado')
+            }
+
+            //Comprobar existencia de la mesa de votacion
+            const mesaData = await MesaVotacion.findOne({ _id: mesa_votacion_id })
+
+            if (!mesaData) {
+                throw new Error('No existe la mesa a buscar')
+            }
+
+            //Guardar en BD
+            try {
+                const actaMesa = new ActasMesa(input)
+                actaMesa.save()
+                return actaMesa
+            } catch (error) {
+                console.log(error)
+            }
+        },
+        //Usuario
+        nuevoUsuario: async (_, { input }) => {
+            const { email, password } = input
+
+            const existeUsuario = await Usuario.findOne({ email })
+
+            if (existeUsuario) {
+                throw new Error('El usuario ya esta registrado')
+            }
+
+            //Hashear password
+            const salt = await bcryptjs.genSaltSync(10)
+            input.password = await bcryptjs.hashSync(password, salt)
+
+            //Guardar en BD
+            try {
+                const usuario = new Usuario(input)
+                usuario.save()
+                //return usuario
+            } catch (error) {
+                console.log(error)
+            }
+        },
+        autenticarUsuario: async (_, { input }) => {
+            const {email, password } = input
+            
+            //El usuario existe
+            const existeUsuario = await Usuario.findOne({ email })
+
+            if (!existeUsuario) {
+                throw new Error('El usuario no esta registrado')
+            }
+
+            //Revisar si el password es correcto
+            const passwordCorrecto = await bcryptjs.compareSync(password, existeUsuario.password)
+
+            if (!passwordCorrecto) {
+                throw new Error('El password es incorrecto')
+            }
+
+            //Crear token
+            return {
+                token: crearToken(existeUsuario, process.env.SIGN_SECRET, '24h')
             }
         }
     }
