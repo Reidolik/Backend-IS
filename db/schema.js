@@ -179,7 +179,7 @@ const typeDefs = gql`
         obtenerCiudadano (dpi: String!): Ciudadano
         #Candidato
         obtenerCandidato (dpi: String!): Candidato
-        obtenerCandidatos : [Candidato]
+        obtenerCandidatos: [Candidato]
         #Voto
         obtenerVoto (dpi: ID!, anio: Int!): Voto
         #Eleccion
@@ -193,7 +193,7 @@ const typeDefs = gql`
         #Actas de mesa
         obtenerActasMesa (idMesa: ID, anio: Int!): ActasMesa
         #Usuario
-        obtenerUsuario (token: String!): Usuario
+        obtenerUsuario: Usuario
     }
 
     #Mutation

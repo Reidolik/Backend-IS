@@ -165,10 +165,8 @@ const resolvers = {
             }
         },
         //Usuario
-        obtenerUsuario: async (_, { token }) => {
-            const usuarioId = await jwt.verify(token, process.env.SIGN_SECRET)
-
-            return usuarioId
+        obtenerUsuario: async (_, { }, ctx) => {
+            return ctx.usuario
         }
     },
     Mutation: {
