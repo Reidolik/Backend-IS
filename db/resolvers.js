@@ -32,6 +32,14 @@ const resolvers = {
                 console.log(error)
             }
         },
+        obtenerCiudadanos: async () => {
+            try {
+                const ciudadanosData = await Ciudadano.find({})
+                return ciudadanosData
+            } catch (error) {
+                console.log(error)
+            }
+        },
         //Candidato
         obtenerCandidato: async (_, { dpi }) => {
             try {
@@ -69,6 +77,14 @@ const resolvers = {
             try {
                 const votoData = await Voto.findOne({ ciudadano_id: existeCiudadano._id, eleccion_id: existeEleccion._id })
                 return votoData
+            } catch (error) {
+                console.log(error)
+            }
+        },
+        obtenerVotos: async () => {
+            try {
+                const votosData = await Voto.find({})
+                return votosData
             } catch (error) {
                 console.log(error)
             }
@@ -141,7 +157,7 @@ const resolvers = {
             }
         },
         //Actas de mesa
-        obtenerActasMesa: async(_, { idMesa, anio }) => {
+        obtenerActasMesa: async (_, { idMesa, anio }) => {
 
             //Verificar la existencia de la mesa
             const mesaData = await MesaVotacion.findOne({ _id: idMesa })
@@ -228,7 +244,7 @@ const resolvers = {
             // const options = { ciudadano_id: ciudadano_id, eleccion_id: eleccion_id }
             // options.fecha_voto = { $gte: fechaHoy }
 
-            const existeVoto = await Voto.findOne({ ciudadano_id: ciudadano_id, eleccion_id: eleccion_id, fecha_voto: { $gte: fechaHoy } })
+            const existeVoto = await Voto.findOne({ ciudadano_id: ciudadano_id, eleccion_id: eleccion_id })
 
             if (existeVoto) {
                 throw new Error('Voto ya esta registrado')
@@ -248,7 +264,7 @@ const resolvers = {
         nuevaEleccion: async (_, { input }) => {
             const { anio_eleccion } = input
 
-            //Revisar si el ciudadano esta registrado
+            //Revisar si la eleccion esta registrada
             const existeEleccion = await Eleccion.findOne({ anio_eleccion })
 
             if (existeEleccion) {
@@ -413,8 +429,8 @@ const resolvers = {
             }
         },
         autenticarUsuario: async (_, { input }) => {
-            const {email, password } = input
-            
+            const { email, password } = input
+
             //El usuario existe
             const existeUsuario = await Usuario.findOne({ email })
 
@@ -433,7 +449,15 @@ const resolvers = {
             return {
                 token: crearToken(existeUsuario, process.env.SIGN_SECRET, '24h')
             }
-        }
+        },
+        autenticarCiudadano: async (_, { dpi }) => {
+            try {
+                const ciudadanoData = await Ciudadano.findOne({ dpi })
+                return ciudadanoData
+            } catch (error) {
+                console.log(error)
+            }
+        },
     }
 }
 

@@ -177,11 +177,13 @@ const typeDefs = gql`
     type Query {
         #Ciudadano
         obtenerCiudadano (dpi: String!): Ciudadano
+        obtenerCiudadanos: [Ciudadano]
         #Candidato
         obtenerCandidato (dpi: String!): Candidato
         obtenerCandidatos: [Candidato]
         #Voto
         obtenerVoto (dpi: ID!, anio: Int!): Voto
+        obtenerVotos: [Voto]
         #Eleccion
         obtenerEleccion (anio: Int!): Eleccion
         #Mesa de votacion
@@ -200,6 +202,7 @@ const typeDefs = gql`
     type Mutation {
         #Ciudadano 
         nuevoCiudadano (input: CiudadanoInput!): Ciudadano
+        autenticarCiudadano (dpi: String!): Ciudadano
         #Candidato 
         nuevoCandidato (input: CandidatoInput!): Candidato
         #voto
