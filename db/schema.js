@@ -188,12 +188,15 @@ const typeDefs = gql`
         obtenerEleccion (anio: Int!): Eleccion
         #Mesa de votacion
         obtenerMesaVotacionVotante (dpi: ID!, anio: Int!): MesaVotacion
+        obtenerMesasVotacion: [MesaVotacion]
         #Resultado electoral
         obtenerResultadosElectorales (anio: Int!): [ResultadoElectoral]
         #Autoridad de mesa
         obtenerAutoridadMesa (nombre: String!, apellido: String!, idMesa: ID!): AutoridadMesa
+        obtenerAutoridadesMesas: [AutoridadMesa]
         #Actas de mesa
-        obtenerActasMesa (idMesa: ID, anio: Int!): ActasMesa
+        obtenerActaMesa (idMesa: ID, anio: Int!): ActasMesa
+        obtenerActasMesas: [ActasMesa]
         #Usuario
         obtenerUsuario: Usuario
     }

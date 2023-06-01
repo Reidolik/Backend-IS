@@ -122,6 +122,15 @@ const resolvers = {
                 console.log(error)
             }
         },
+        obtenerMesasVotacion: async () => {
+            try {
+                const mesasVotacionesData = await MesaVotacion.find({})
+                return mesasVotacionesData
+            } catch (error) {
+                console.log(error)
+            }
+
+        },
         //Resultado electoral
         obtenerResultadosElectorales: async (_, { anio }) => {
 
@@ -156,8 +165,17 @@ const resolvers = {
                 console.log(error)
             }
         },
+        obtenerAutoridadesMesas: async () => {
+
+            try {
+                const autoridadesMesas = await AutoridadMesa.find({})
+                return autoridadesMesas
+            } catch (error) {
+                console.log(error)
+            }
+        },
         //Actas de mesa
-        obtenerActasMesa: async (_, { idMesa, anio }) => {
+        obtenerActaMesa: async (_, { idMesa, anio }) => {
 
             //Verificar la existencia de la mesa
             const mesaData = await MesaVotacion.findOne({ _id: idMesa })
@@ -176,6 +194,14 @@ const resolvers = {
             try {
                 const actaMesa = await ActasMesa.findOne({ mesa_votacion_id: idMesa, eleccion_id: existeEleccion._id })
                 return actaMesa
+            } catch (error) {
+                console.log(error)
+            }
+        },
+        obtenerActasMesas: async () => {
+            try {
+                const actasMesas = await ActasMesa.find({})
+                return actasMesas
             } catch (error) {
                 console.log(error)
             }
@@ -390,7 +416,7 @@ const resolvers = {
             }
 
             //Comprobar existencia de la mesa de votacion
-            const mesaData = await MesaVotacion.findOne({ _id: mesa_votacion_id })
+            const mesaData = await MesaVotacion.findOne({ _id: input.mesa_votacion_id })
 
             if (!mesaData) {
                 throw new Error('No existe la mesa a buscar')
@@ -398,6 +424,7 @@ const resolvers = {
 
             //Guardar en BD
             try {
+                input.eleccion_id = existeEleccion._id
                 const actaMesa = new ActasMesa(input)
                 actaMesa.save()
                 return actaMesa
